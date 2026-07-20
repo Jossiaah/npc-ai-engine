@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Production GenAI NPC Interface</title>
+    <script src="https://tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans">
+
+    <!-- App Header Layout -->
+    <header class="border-b border-slate-800 bg-slate-950 p-4 shadow-md flex justify-between items-center">
+        <h1 class="text-xl font-bold tracking-wide text-emerald-400">🤖 NPC GenAI Core Engine v1.0</h1>
+        <div class="flex items-center gap-3">
+            <label for="npcSelect" class="text-sm font-medium text-slate-400">Target Entity:</label>
+            <select id="npcSelect" class="bg-slate-800 border border-slate-700 rounded px-3 py-1.5 text-sm outline-none focus:border-emerald-500">
+                <option value="ignis">Ignis the Iron-Willed</option>
+                <option value="luna">Archmage Luna</option>
+            </select>
+        </div>
+    </header>
+
+    <!-- Main Live Workspace Split Grid -->
+    <main class="flex-1 flex overflow-hidden">
+        
+        <!-- Left Pane: Modern Clean Async Chat Feed -->
+        <section class="w-2/3 flex flex-col border-r border-slate-800 bg-slate-900">
+            <div id="chatWindow" class="flex-1 p-6 overflow-y-auto space-y-4">
+                <!-- Dialogue bubbles injected programmatically by modern DOM runtime client -->
+                <div class="bg-slate-800 border border-slate-700 rounded-lg p-4 max-w-2xl">
+                    <p class="text-xs text-emerald-400 font-semibold uppercase mb-1">System Daemon</p>
+                    <p class="text-slate-300">Target endpoint ready. Initialize transmission by typing below.</p>
+                </div>
+            </div>
+            
+            <!-- Dedicated Footer Chat Input Control Form -->
+            <form id="chatForm" class="p-4 bg-slate-950 border-t border-slate-800 flex gap-3">
+                <input type="text" id="userInput" placeholder="Address the character..." required autocomplete="off"
+                       class="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 outline-none text-slate-100 placeholder-slate-500 focus:border-emerald-500 transition-colors">
+                <button type="submit" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-6 py-3 rounded-lg transition-colors shadow-sm">
+                    Transmit
+                </button>
+            </form>
+        </section>
+
+        <!-- Right Pane: Live Streaming Telemetry Dashboard (Enterprise Diagnostics) -->
+        <section class="w-1/3 bg-slate-950 p-6 flex flex-col space-y-6 overflow-y-auto">
+            <div>
+                <h2 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Live Telemetry Analysis</h2>
+                <div class="bg-slate-900 border border-slate-800 rounded-lg p-4 space-y-3">
+                    <div class="flex justify-between border-b border-slate-800 pb-2">
+                        <span class="text-sm text-slate-400">Primary Emotion:</span>
+                        <span id="telemetryEmotion" class="text-sm font-mono text-amber-400">Awaiting Data</span>
+                    </div>
+                    <div class="flex justify-between pt-1">
+                        <span class="text-sm text-slate-400">Affinitive Shifts:</span>
+                        <span id="telemetryAffinity" class="text-sm font-mono text-cyan-400">No Changes</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex-1 flex flex-col min-h-0">
+                <h2 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Raw Engine JSON State Payload</h2>
+                <pre id="jsonDebug" class="flex-1 bg-slate-900 border border-slate-800 text-emerald-400 font-mono text-xs p-4 rounded-lg overflow-auto whitespace-pre-wrap">{}</pre>
+            </div>
+        </section>
+    </main>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
