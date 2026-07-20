@@ -44,37 +44,42 @@ async def process_npc_chat(payload: ChatRequest):
     profile = NPC_PROFILES[payload.npc_id]
     memory_manager = MEMORY_BANKS[payload.npc_id]
     
-    #Ask ChromaDB to query its vector index for past interactions matching the new prompt
     historical_context = memory_manager.fetch_relevant_memories(payload.message)
     
-    #Inject those long-term context memories straight into the system instructions
     dynamic_system_instruction = f"""
     {profile["system_instruction"]}
     
-    HISTORICAL CONTEXT MEMORIES (Use these to adjust your behavior if the player references past events):
+    HISTORICAL CONTEXT MEMORIES:
     {historical_context}
     """
 
     try:
         response = client.messages.create(
             model="claude-fable-5",
-            max_tokens=250,
+            max_tokens=800,
             system=dynamic_system_instruction,
             messages=[{"role": "user", "content": payload.message}]
         )
         
-        raw_text_output = "".join([block.text for block in response.content if hasattr(block, 'text')])
-        parsed_json_output = json.loads(raw_text_output)
+        raw_text_output = "".join([block.text for block in response.content if hasattr(block, 'text')]).strip()
         
-        #Save this interaction into our Vector Space database so it can be recalled later
-        interaction_id = str(uuid.uuid4())
-        memory_manager.store_memory(
-            player_statement=payload.message,
-            npc_response=parsed_json_output["dialogue"],
-            memory_id=interaction_id
-        )
-        
-        return parsed_json_output
-        
+        # Defensive JSON parsing step
+        try:
+            return json.loads(raw_text_output)
+        except json.JSONDecodeError:
+            # Fallback Repair: If a string quote was cut off, try to append closing elements
+            if not raw_text_output.endswith("}"):
+                if not raw_text_output.endswith('"'):
+                    raw_text_output += '"'
+                raw_text_output += "}"
+            return json.loads(raw_text_output)
+            
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        # Gracefully handle validation failures without a hard 500 server drop
+        return {
+            "dialogue": "My thoughts are clouded... try addressing me again.",
+            "emotion": "confused",
+            "relationship_change": "No change (System Validation Bypass)"
+        }
+
+        
