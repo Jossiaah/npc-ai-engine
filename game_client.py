@@ -23,3 +23,24 @@ luna_pos = [250, 150] # Placed intentionally close together to trigger conversat
 
 player_speed = 5
 clock = pygame.time.Clock()
+
+# Timers to control NPC autonomous action frequency
+NPC_TICK_EVENT = pygame.USEREVENT + 1
+pygame.time.set_timer(NPC_TICK_EVENT, 10000) # Ticks every 10 seconds
+
+def trigger_npc_interaction():
+    """Async background task so the game engine doesn't freeze during API calls."""
+    try:
+        # Step 1: Simulate Ignis addressing Luna because they are standing next to each other
+        payload = {
+            "npc_id": "ignis",
+            "message": "Archmage Luna! What are you doing outside your tower? Is that magical residue I smell?"
+        }
+        response = requests.post("http://127.0.0", json=payload)
+        
+        if response.status_code == 200:
+            data = response.json()
+            print(f"\n[Autonomous Chat Log] Ignis says to Luna: {payload['message']}")
+            print(f"[Autonomous Chat Log] Luna responds: {data['dialogue']} (Emotion: {data['emotion']})")
+    except Exception as e:
+        print(f"Agent synchronization pipeline error: {e}")
