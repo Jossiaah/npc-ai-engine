@@ -28,6 +28,30 @@ class ChatRequest(BaseModel):
     npc_id: str
     message: str
 
+class PositionUpdateRequest(BaseModel):
+    npc_id: str
+    x: int
+    y: int
+
+@app.get("/api/v1/positions")
+async def get_npc_positions():
+    """Returns the current persistent position coordinates from the configuration disk data."""
+    return {npc_id: {"x": profile["x"], "y": profile["y"]} for npc_id, profile in NPC_PROFILES.items()}
+
+@app.post("/api/v1/positions/update")
+async def update_npc_position(payload: PositionUpdateRequest):
+    """Saves updated coordinates directly back to the JSON file system."""
+    if payload.npc_id not in NPC_PROFILES:
+        raise HTTPException(status_code=404, detail="NPC target not found")
+        
+    NPC_PROFILES[payload.npc_id]["x"] = payload.x
+    NPC_PROFILES[payload.npc_id]["y"] = payload.y
+    
+    with open("config/npc_profiles.json", "w") as f:
+        json.dump(NPC_PROFILES, f, indent=2)
+        
+    return {"status": "success", "message": f"Saved {payload.npc_id} coordinates successfully."}
+
 @app.get("/")
 async def serve_home(request: Request):
     return templates.TemplateResponse(
